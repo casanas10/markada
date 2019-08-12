@@ -1,7 +1,6 @@
 import time
 from selenium import webdriver
 from newspaper import Article
-import articleDateExtractor
 
 if __name__ == "__main__":
 
