@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Float, Date, TEXT
 from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 
 import os
 import config
@@ -11,12 +12,17 @@ import datetime
 
 app = flask.Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://" + config.dbConfig["user"] + ":"+ config.dbConfig["password"] +"@"+ config.dbConfig["host"]+"/articles"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://" \
+                                        + config.dbConfig["user"] + ":" \
+                                        + config.dbConfig["password"] + "@" \
+                                        + config.dbConfig["host"]+"/articles"
 
+app.config["JWT_SECRET_KEY"] = "super-secret" #TODO change later
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+jwt = JWTManager(app)
 app.config["DEBUG"] = True
 
 
@@ -69,38 +75,46 @@ Notably, IBM stated that signings declined 14% on cc basis in the second quarter
 def home():
     return jsonify(message="<h1> Return Me!!</h1>")
 
-@app.route('/v1/news', methods=['GET'])
-def get_all_news():
 
-    query_params = request.args
-    from_param = query_params.get('from')
-    to_param = query_params.get('to')
-
-    query = "SELECT * FROM books WHERE"
-    to_filter = []
-
-    if from_param:
-        query += ' from=? AND'
-        to_filter.append(from_param)
-    if to_param:
-        query += ' to=? AND'
-        to_filter.append(to_param)
-
-    if not (from_param or to_param):
-        return page_not_found(404)
-
-    query = query[:-4] + ';'
-
-    print(query)
-    print(to_filter)
-
-    return "ALL NEWS PLEASE"
-
-@app.route('/news', methods=["GET"])
+@app.route('/v1/news', methods=["GET"])
 def news():
     news_list = Article.query.all()
     result = articles_schema.dump(news_list)
     return jsonify(result)
+
+@app.route('/register', methods=["POST"])
+def register():
+    email = request.form["email"]
+    test = User.query.filter_by(email=email).first() # check if user has already been registered or not
+    if test:
+        return jsonify(message="That email already exists."), 409
+    else:
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        password = request.form["password"]
+
+        user = User(first_name=first_name, last_name=last_name, email=email, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify(message="User created successfully"), 201
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    if request.is_json:
+        email = request.json["email"]
+        password = request.json["password"]
+    else:
+        email = request.form["email"]
+        password = request.form["password"]
+
+    test = User.query.filter_by(email=email, password=password).first()
+
+    if test:
+        access_token = create_access_token(identity=email)
+        return jsonify(message="Login succeeded!", access_token=access_token)
+    else:
+        return jsonify(message="Bad email or password"), 401
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -139,7 +153,6 @@ article_schema = ArticleSchema()
 articles_schema = ArticleSchema(many=True)
 
 if __name__ == "__main__":
-
     app.run()
 
 
