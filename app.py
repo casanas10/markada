@@ -3,6 +3,8 @@ from flask import request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Float, Date, TEXT
+from flask_marshmallow import Marshmallow
+
 import os
 import config
 import datetime
@@ -10,12 +12,11 @@ import datetime
 app = flask.Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://" + config.dbConfig["user"] + ":"+ config.dbConfig["password"] +"@"+ config.dbConfig["host"]+"/articles"
-# engine = create_engine("mysql+mysqldb://" + config.dbConfig["user"] + ":"+ config.dbConfig["password"] +"@"+ config.dbConfig["host"]+"/articles")
-# connection = engine.connect()
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 app.config["DEBUG"] = True
 
 
@@ -95,6 +96,12 @@ def get_all_news():
 
     return "ALL NEWS PLEASE"
 
+@app.route('/news', methods=["GET"])
+def news():
+    news_list = Article.query.all()
+    result = articles_schema.dump(news_list)
+    return jsonify(result)
+
 @app.errorhandler(404)
 def page_not_found(e):
     return "<h1>404</h1><p>Page Not Found</p>", 404
@@ -117,6 +124,19 @@ class Article(db.Model):
     article_title = Column(TEXT)
     article_content = Column(TEXT)
 
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'first_name', 'last_name', 'email', 'password')
+
+class ArticleSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'author', 'publishedDate', 'article_title', 'article_content')
+
+user_schema = UserSchema() # if you are expecting 1 record back
+users_schema = UserSchema(many=True) #if expecting many records back
+
+article_schema = ArticleSchema()
+articles_schema = ArticleSchema(many=True)
 
 if __name__ == "__main__":
 
