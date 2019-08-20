@@ -12,10 +12,20 @@ import datetime
 
 app = flask.Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://" \
+
+ENV = 'dev'
+# ENV = 'prod'
+
+if ENV == 'dev':
+    app.debug = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" \
                                         + config.dbConfig["user"] + ":" \
                                         + config.dbConfig["password"] + "@" \
                                         + config.dbConfig["host"]+"/articles"
+else:
+    app.debug = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.productionConfig
+
 
 app.config["JWT_SECRET_KEY"] = "super-secret" #TODO change later
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -23,7 +33,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
-app.config["DEBUG"] = True
 
 
 #Creating the database
@@ -73,7 +82,7 @@ Notably, IBM stated that signings declined 14% on cc basis in the second quarter
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify(message="<h1> Return Me!!</h1>")
+    return "<h1> Home!!</h1>"
 
 
 @app.route('/v1/news', methods=["GET"])
