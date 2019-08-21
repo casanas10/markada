@@ -6,7 +6,6 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 
 import os
-import config
 import datetime
 
 app = flask.Flask(__name__)
@@ -17,13 +16,14 @@ ENV = 'dev'
 
 if ENV == 'dev':
     app.debug = True
+    import config
     app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" \
                                         + config.dbConfig["user"] + ":" \
                                         + config.dbConfig["password"] + "@" \
                                         + config.dbConfig["host"]+"/articles"
 else:
     app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.productionConfig
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['CLEARDB_DATABASE_URL']
 
 
 app.config["JWT_SECRET_KEY"] = "super-secret" #TODO change later
