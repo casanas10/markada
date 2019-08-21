@@ -15,15 +15,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 ENV = 'prod'
 
 if ENV == 'dev':
-    app.debug = True
     import config
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" \
-                                        + config.dbConfig["user"] + ":" \
-                                        + config.dbConfig["password"] + "@" \
-                                        + config.dbConfig["host"]+"/articles"
+    app.debug = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = config.devConfig
 else:
     app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['CLEARDB_DATABASE_URL']
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 
 app.config["JWT_SECRET_KEY"] = "super-secret" #TODO change later
