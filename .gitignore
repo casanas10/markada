@@ -3,4 +3,4 @@ env/
 __pycache__/
 config.py
 .DS_Store
-.env
+api.egg-info/

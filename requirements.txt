@@ -7,3 +7,5 @@ marshmallow-sqlalchemy
 flask-marshmallow
 Flask-JWT-Extended
 mysqlclient
+flask-bootstrap
+WTForms

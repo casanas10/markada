@@ -1,0 +1,25 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}What's for dinner?{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% if food %}
+        <div class="alert alert-success">
+            <h1>I want {{ food }}</h1>
+        </div>
+
+    {% else %}
+        <div class="alert alert-info">
+            <h1>Anything is fine</h1>
+        </div>
+    {% endif %}
+{% if list %}
+    <ul>
+        {% for n in list %}
+            <li><a href="/dinner/{{n}}">{{n}}</a> </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</div>
+{% endblock %}

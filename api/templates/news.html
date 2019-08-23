@@ -1,0 +1,17 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Database News{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+	<h3>News</h3>
+		<ul>
+		{% for n in news %}
+			<li>{{n.author}} : {{n.article_title}}</li>
+		{% endfor %}
+		</ul>
+</div>
+
+{% endblock %}
