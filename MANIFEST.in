@@ -1,0 +1,3 @@
+recursive-include api/templates
+include config.py
+global-exclude *.pyc
