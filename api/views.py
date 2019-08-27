@@ -5,15 +5,10 @@ from api import app, db, models
 
 
 import pandas as pd
-import numpy as np
 import nltk
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from tensorflow.python.keras.models import load_model
 from newspaper import Article
 import string
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from tensorflow.python.keras.preprocessing.text import Tokenizer
 import pickle
 from sklearn.externals import joblib
 
