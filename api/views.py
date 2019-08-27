@@ -5,10 +5,7 @@ from api import app, db, models
 
 
 import pandas as pd
-import nltk
-import re
 from newspaper import Article
-import string
 import pickle
 from sklearn.externals import joblib
 
@@ -19,15 +16,6 @@ Bootstrap(app)
 class LinkForm(Form):
     link = TextField("Link:")
 
-
-stopwords = nltk.corpus.stopwords.words('english')
-ps = nltk.PorterStemmer()
-
-def clean_text(text):
-    text = "".join([word.lower() for word in text if word not in string.punctuation])
-    tokens = re.split('\W+', text)
-    text = [ps.stem(word) for word in tokens if word not in stopwords]
-    return text
 
 def sentiment_analysis(x):
 
