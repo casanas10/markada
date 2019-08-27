@@ -18,15 +18,17 @@
                 <h3 class="py-2">Super fast sentiment analysis of financial news article</h3>
 
                 <div class="pt-2">
-                    <form action="" method="post">
-                        <div class="form-group">
-                            {{ form.link.label }} {{ form.link(class="form-control",placeholder="Enter link") }}
-                        </div>
-
-                        <div class="input submit ">
-                            <button type="submit" class="btn btn-success">Submit</button>
-                        </div>
+                    <form method="POST">
+                        {{ form.link.label }} {{ form.link(class="form-control", placeholder="Enter link") }}
+                        {{ form.submit(class="btn btn-success") }}
                     </form>
+                </div>
+                <div class="py-3">
+                    {% for message in get_flashed_messages() %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

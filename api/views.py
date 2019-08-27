@@ -1,8 +1,9 @@
-from flask import render_template, request, flash
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from flask_bootstrap import Bootstrap
 from wtforms import Form, TextField, TextAreaField, StringField, SubmitField
+from wtforms.validators import DataRequired
 from api import app, db, models
-
+import json
 
 import pandas as pd
 from newspaper import Article
@@ -14,7 +15,8 @@ Bootstrap(app)
 
 
 class LinkForm(Form):
-    link = TextField("Link:")
+    link = StringField("Enter an article link:", validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 
 def sentiment_analysis(x):
@@ -24,39 +26,79 @@ def sentiment_analysis(x):
     with open("api/data/rf_model.pkl", 'rb') as file:
         rf_model = pickle.load(file)
 
-    x = [
-        'March 15 (Reuters) - Mobile phone chip supplier Qualcomm Inc on Friday won a court victory against iPhone maker Apple Inc, with a jury in federal court in San Diego finding that Apple infringed on three of Qualcomm’s patents, a Qualcomm spokeswoman told Reuters. (Reporting by Stephen Nellis; Editing by Richard Chang)']
-
     tfidfVectorizer = joblib.load('api/data/tfidfVectorizer.pkl')
 
-    tfidf_train = tfidfVectorizer.transform(x)
+    tfidf_train = tfidfVectorizer.transform([x])
     x = pd.DataFrame(tfidf_train.toarray())
 
-    print(rf_model.predict(x))
+    return rf_model.predict(x)[0]
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
 
     form = LinkForm(request.form)
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate():
+
         link = request.form['link']
-        print(link)
 
         article = Article(link)
         article.download()
         article.parse()
 
-        print("-------")
-        print(article.title)
-        print(article.text)
-        print(article.publish_date)
-        print(article.authors)
+        sentiment = sentiment_analysis(article.title)
 
-        sentiment_analysis(article.title)
+        flash("Sentiment: " + str(sentiment))
+        flash("Headline: " + str(article.title))
+        flash("Article Content: " + str(article.text))
+        flash("Published Date: " + str(article.publish_date))
+        flash("Authors: " + str(article.authors))
+        flash("url: " + str(link))
 
-        flash("This is the link:" + link)
+        resp = {
+            "sentiment": str(sentiment),
+            "headline": str(article.title),
+            "content": str(article.text),
+            "publishedDate": str(article.publish_date),
+            "authors": str(article.authors),
+            "url": str(link)
+        }
+
+        flash("JSON Response: " + str(resp))
+
+        return redirect(url_for('index'))
+
     return render_template('index.html', form=form)
+
+@app.route("/v1/news/")
+def news_sentiment_analysis():
+
+    link = request.args.get('url')
+
+    article = Article(link)
+    article.download()
+    article.parse()
+
+    sentiment = sentiment_analysis(article.title)
+
+    flash("Sentiment: " + str(sentiment))
+    flash("Headline: " + str(article.title))
+    flash("Article Content: " + str(article.text))
+    flash("Published Date: " + str(article.publish_date))
+    flash("Authors: " + str(article.authors))
+    flash("url: " + str(link))
+
+    resp = {
+        "sentiment": str(sentiment),
+        "headline": str(article.title),
+        "content": str(article.text),
+        "publishedDate": str(article.publish_date),
+        "authors": str(article.authors),
+        "url": str(link)
+    }
+
+    return jsonify(resp)
+
 
 @app.route("/news")
 def show_news():
