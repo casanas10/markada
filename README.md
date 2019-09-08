@@ -7,6 +7,9 @@ The goal of this app is to serve as a additional feature(check) to make a traidi
 You can find the app here: https://markada.herokuapp.com/
 - Sometimes heroku takes a little second to fire up so please allow a couple of seconds when first loading the app
 
+You can find the Analyse part of the app in this repo:
+https://github.com/casanas10/NewsSentimentAnalysis
+
 ## TechStack
 * Python 
 * Flask
