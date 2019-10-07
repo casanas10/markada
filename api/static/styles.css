@@ -1,3 +1,36 @@
-.btn-success {
-    text-decoration-color: red;
+
+.shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
+.site-header {
+background: #00B4DB;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #0083B0, #00B4DB);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #0083B0, #00B4DB); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.site-header .layout-hero {
+    min-height: 50vh;
+}
+
+#page-hero .page-section-title {
+    font-weight: 300;
+    color: white;
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: #000099 !important;
+}
+
+.layout-works {
+    text-align: center;
+}
+
+.flexContainer {
+    display: flex;
+}
+
+.form-control {
+    flex: 1;
+}
+

@@ -15,7 +15,7 @@ Bootstrap(app)
 
 
 class LinkForm(Form):
-    link = StringField("Enter an article link:", validators=[DataRequired()])
+    link = StringField("")
     submit = SubmitField('Submit')
 
 
@@ -38,35 +38,35 @@ def sentiment_analysis(x):
 def index():
 
     form = LinkForm(request.form)
+
     if request.method == 'POST' and form.validate():
 
         link = request.form['link']
 
-        article = Article(link)
-        article.download()
-        article.parse()
+        try:
+            article = Article(link)
+            article.download()
+            article.parse()
 
-        sentiment = sentiment_analysis(article.title)
+            sentiment = sentiment_analysis(article.title)
+            authors = ",".join(article.authors)
+        except:
 
-        flash("Sentiment: " + str(sentiment))
-        flash("Headline: " + str(article.title))
-        flash("Article Content: " + str(article.text))
-        flash("Published Date: " + str(article.publish_date))
-        flash("Authors: " + str(article.authors))
-        flash("url: " + str(link))
+            flash("Article URL is invalid. Please try again", "error")
+            return render_template('index.html', form=form)
 
         resp = {
             "sentiment": str(sentiment),
             "headline": str(article.title),
             "content": str(article.text),
             "publishedDate": str(article.publish_date),
-            "authors": str(article.authors),
-            "url": str(link)
+            "authors": str(authors),
+            "url": str(link),
         }
 
-        flash("JSON Response: " + str(resp))
+        json_res = json.dumps(resp, indent=4)
 
-        return redirect(url_for('index'))
+        return render_template('index.html', form=form, resp=resp, json_res=json_res)
 
     return render_template('index.html', form=form)
 
@@ -80,12 +80,14 @@ def news_sentiment_analysis():
     article.parse()
 
     sentiment = sentiment_analysis(article.title)
+    authors = "".join(article.authors)
+
 
     flash("Sentiment: " + str(sentiment))
     flash("Headline: " + str(article.title))
     flash("Article Content: " + str(article.text))
     flash("Published Date: " + str(article.publish_date))
-    flash("Authors: " + str(article.authors))
+    flash("Authors: " + str(authors))
     flash("url: " + str(link))
 
     resp = {
@@ -99,7 +101,6 @@ def news_sentiment_analysis():
 
     return jsonify(resp)
 
-
 @app.route("/news")
 def show_news():
     news = models.Article.query.all()
@@ -108,3 +109,23 @@ def show_news():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+def stringify(response_string):
+    response = ''
+    for word in response_string.split():
+        new_word = word
+        if word == 'true':
+            new_word = '\"true\"'
+        if word == 'false':
+            new_word = '\"false\"'
+        if word == 'none':
+            new_word = '\"none\"'
+        if word == 'true,':
+            new_word = '\"true\",'
+        if word == 'false,':
+            new_word = '\"false\",'
+        if word == 'none,':
+            new_word = '\"none\",'
+        response += (new_word + ' ')
+    return response
