@@ -5,8 +5,8 @@ from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
-ENV = 'dev'
-# ENV = 'prod'
+# ENV = 'dev'
+ENV = 'prod'
 
 if ENV == 'dev':
     from config import Config
