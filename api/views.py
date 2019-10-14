@@ -71,7 +71,7 @@ def index():
 
     return render_template('index.html', form=form)
 
-@cross_origin()
+@cross_origin(origin='*')
 @app.route("/v1/news/")
 def news_sentiment_analysis():
 
