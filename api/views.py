@@ -49,7 +49,7 @@ def index():
             article.download()
             article.parse()
 
-            sentiment = sentiment_analysis(article.title)
+            sentiment = sentiment_analysis(article.text)
             authors = ",".join(article.authors)
         except:
 
@@ -82,7 +82,7 @@ def news_sentiment_analysis():
         article.download()
         article.parse()
 
-        sentiment = sentiment_analysis(article.title)
+        sentiment = sentiment_analysis(article.text)
         authors = ",".join(article.authors)
 
     except:
@@ -90,7 +90,7 @@ def news_sentiment_analysis():
         resp = {
             "response": "BAD-REQUEST. Could not parse the article. Try another article or check the URL"
         }
-        return jsonify(resp)
+        return jsonify(resp), 404
 
 
 
@@ -110,7 +110,7 @@ def news_sentiment_analysis():
         "url": str(link)
     }
 
-    return jsonify(resp)
+    return jsonify(resp), 200
 
 @app.route("/news")
 def show_news():
