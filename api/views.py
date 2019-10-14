@@ -49,7 +49,7 @@ def index():
             article.download()
             article.parse()
 
-            sentiment = sentiment_analysis(article.title)
+            sentiment = sentiment_analysis(article.text)
             authors = ",".join(article.authors)
         except:
 
@@ -81,7 +81,7 @@ def news_sentiment_analysis():
     article.download()
     article.parse()
 
-    sentiment = sentiment_analysis(article.title)
+    sentiment = sentiment_analysis(article.text)
     authors = "".join(article.authors)
 
 
