@@ -9,6 +9,7 @@ import pandas as pd
 from newspaper import Article
 import pickle
 from sklearn.externals import joblib
+from flask_cors import cross_origin
 
 
 Bootstrap(app)
@@ -70,6 +71,7 @@ def index():
 
     return render_template('index.html', form=form)
 
+@cross_origin()
 @app.route("/v1/news/")
 def news_sentiment_analysis():
 
